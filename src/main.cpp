@@ -173,3 +173,135 @@ void poten1(void)
   ledRdc = map(voltpot1, 0, 4095, 0, 255);
   delay(100);
 }
+//*****************************************************************************************
+//Universidad del Valle de Guatemala
+//BE3015: Electrónica Digital 2
+//Jimena Sánchez
+//Lab 6: TIVA C y ESP32
+
+//*****************************************************************************
+// Definición de pines
+//*****************************************************************************
+
+#define pot2 PE_0
+//botones para incrementar y decrementar
+#define b1 PF_0
+#define b2 PF_4
+
+//#define freqPWMled 5000 //Frecuencia de led en Hz
+//#define resolution 8    //1-16 bits de resolucion
+
+//#define ledR PF_1
+#define ledA PF_2
+#define ledV PF_3
+
+#define Rx PB_0
+#define Tx PB_1
+
+//*****************************************************************************
+// Prototipos de función
+//*****************************************************************************
+void counter(void);
+void poten2 (void);
+
+//*****************************************************************************
+// Variables Globales
+//*****************************************************************************
+double voltpot2 = 0;
+double alpha = 0.09;
+
+int ledRdc = 0;
+int ledAdc = 0;
+int ledVdc = 0;
+
+//*****************************************************************************
+// Configuración
+//*****************************************************************************
+void setup()
+{
+  Serial.begin(9600);
+  Serial1.begin(9600);
+
+  pinMode(ledR, OUTPUT);
+  pinMode(ledA, OUTPUT);
+  pinMode(ledV, OUTPUT);
+
+  pinMode(b1, INPUT_PULLUP);
+  pinMode(b2, INPUT_PULLUP);
+
+}
+//*****************************************************************************
+// Loop Principal
+//*****************************************************************************
+void loop()
+{
+  void poten2();
+  void counter();
+  
+  Serial1.write(1);
+  Serial1.write(ledAdc);
+  Serial1.write(2);
+  Serial1.write(ledVdc);
+  delay(100);
+
+  if(Serial1.available()>0)
+  {
+    ledRdc = Serial1.read();
+    }
+  analogWrite(ledV, ledVdc);
+  analogWrite(ledA, ledAdc);
+  analogWrite(ledR, DCLedR);
+  
+  Serial.println(" Led Rojo | Led Verde | Led Azul ");
+  Serial.print("     ");
+  Serial.print(DCLedR);
+  Serial.print("    |    ");
+  Serial.print(ledVdc);
+  Serial.print("      |   ");
+  Serial.print(ledAdc);
+  Serial.println('\n');
+  
+  delay(100);
+}
+
+
+//*****************************************************************************
+// Contador
+//*****************************************************************************
+void counter(void)
+{
+  int stateup = digitalRead(b1);
+  int statedown = digitalRead(b2);
+
+  if(stateup == LOW)
+  {
+    ledAdc++;
+    delay(50);
+    if (ledAdc > 254)
+    {
+      ledAdc == 0;
+    }
+  }
+  
+  if(statedown == LOW)
+  {
+    ledAdc--;
+    delay(50);
+    if (ledAdc < 1)
+    {
+      ledAdc == 253;
+    }
+  }
+}
+
+  }
+
+//*****************************************************************************
+// potenciometro2
+//*****************************************************************************
+void poten2(void)
+{
+  adcRaw = analogRead(pot2);
+  voltpot2 = (alpha * voltpot2) + ((1.0 - alpha) * voltpot2); //Filtro pasa bajas
+  ledAdc = map(voltpot2, 0, 4095, 0, 255);
+}
